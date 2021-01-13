@@ -52,3 +52,10 @@ mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+    com.example.emos.wx.db.dao : warn
+  pattern:
+    console: "%d{HH:mm:ss}  %-5level  %msg%n"
