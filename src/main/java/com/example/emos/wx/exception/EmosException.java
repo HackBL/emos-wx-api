@@ -22,4 +22,10 @@ public class EmosException extends RuntimeException{
         this.msg = msg;
         this.code = code;
     }
+
+    public EmosException(String msg, int code,  Throwable e) {
+        super(msg, e);
+        this.msg = msg;
+        this.code = code;
+    }
 }
