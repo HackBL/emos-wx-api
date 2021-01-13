@@ -16,4 +16,10 @@ public class EmosException extends RuntimeException{
         super(msg, e);
         this.msg = msg;
     }
+
+    public EmosException(String msg, int code) {
+        super(msg);
+        this.msg = msg;
+        this.code = code;
+    }
 }
