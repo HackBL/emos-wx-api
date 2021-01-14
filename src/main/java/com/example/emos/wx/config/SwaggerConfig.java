@@ -8,7 +8,10 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -44,6 +47,17 @@ public class SwaggerConfig {
         List<ApiKey> apiKeyList = new ArrayList<>();
         apiKeyList.add(apiKey);
         docket.securitySchemes(apiKeyList);
+        
+        // global scope of tokens in swagger
+        AuthorizationScope scope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope[] scopes = {scope};
+        SecurityReference reference = new SecurityReference("token", scopes);
+        List<SecurityReference> refList = new ArrayList<>();
+        refList.add(reference);
+        SecurityContext context = SecurityContext.builder().securityReferences(refList).build();
+        List<SecurityContext> ctxList = new ArrayList<>();
+        ctxList.add(context);
+        docket.securityContexts(ctxList);
 
         return docket;
     }
