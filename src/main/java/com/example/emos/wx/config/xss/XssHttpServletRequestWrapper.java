@@ -32,7 +32,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             // Iterate arr and filter each value to prevent XSS Attack
             for (int i = 0; i < values.length; i++) {
                 String value = values[i];
-                if (!StrUtil.hasEmpty(values)) {
+                if (!StrUtil.hasEmpty(value)) {
                     value = HtmlUtil.filter(value);
                 }
                 values[i] = value;
@@ -54,7 +54,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                 // Iterate arr and filter each value to prevent XSS Attack
                 for (int i = 0; i < values.length; i++) {
                     String value = values[i];
-                    if (!StrUtil.hasEmpty(values)) {
+                    if (!StrUtil.hasEmpty(value)) {
                         value = HtmlUtil.filter(value);
                     }
                     values[i] = value;
