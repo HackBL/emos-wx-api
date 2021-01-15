@@ -8,10 +8,7 @@ import springfox.documentation.spring.web.json.Json;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -110,18 +107,22 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         for (String key: map.keySet()) {
             Object val = map.get(key);
-            // if val is string, put into new map
+            // put object into new map only if object is String type
             if (val instanceof String) {
                 if (!StrUtil.hasEmpty(val.toString())) {
                     // store filtered values into new map
                     result.put(key, HtmlUtil.filter(val.toString()));
                 }
             }
-            // put original type into new map
-            else {
+             else {
                 result.put(key, val);
             }
         }
+
+        // convert Map to (String)Json
+        String json = JSONUtil.toJsonStr(result);
+        // Create I/O Stream to read from Json
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes());
 
         return null;
     }
