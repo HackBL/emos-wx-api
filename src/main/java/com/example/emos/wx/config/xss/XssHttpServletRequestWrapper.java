@@ -3,6 +3,7 @@ package com.example.emos.wx.config.xss;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import cn.hutool.json.JSONUtil;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -101,6 +102,9 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         buffer.close();
         reader.close();
         in.close();
+
+        // Convert JSON to Map
+        Map<String, Object> map = JSONUtil.parseObj(sb.toString());
 
         return null;
     }
