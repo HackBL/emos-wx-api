@@ -105,6 +105,23 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         // Convert JSON to Map
         Map<String, Object> map = JSONUtil.parseObj(sb.toString());
+        // Use for store filtered values
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        for (String key: map.keySet()) {
+            Object val = map.get(key);
+            // if val is string, put into new map
+            if (val instanceof String) {
+                if (!StrUtil.hasEmpty(val.toString())) {
+                    // store filtered values into new map
+                    result.put(key, HtmlUtil.filter(val.toString()));
+                }
+            }
+            // put original type into new map
+            else {
+                result.put(key, val);
+            }
+        }
 
         return null;
     }
