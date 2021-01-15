@@ -65,4 +65,14 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         return map;
     }
+
+    @Override
+    public String getHeader(String name) {
+        String value = super.getHeader(name);
+        if (!StrUtil.hasEmpty(value)) {
+            value = HtmlUtil.filter(value);
+        }
+        
+        return value;
+    }
 }
