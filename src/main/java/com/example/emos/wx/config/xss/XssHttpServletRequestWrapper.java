@@ -5,6 +5,7 @@ import cn.hutool.http.HtmlUtil;
 import cn.hutool.json.JSONUtil;
 import springfox.documentation.spring.web.json.Json;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -124,6 +125,26 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         // Create I/O Stream to read from Json
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(json.getBytes());
 
-        return null;
+        return new ServletInputStream() {
+            @Override
+            public boolean isFinished() {
+                return false;
+            }
+
+            @Override
+            public boolean isReady() {
+                return false;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+
+            }
+
+            @Override
+            public int read() throws IOException {
+                return byteArrayInputStream.read();
+            }
+        };
     }
 }
