@@ -10,6 +10,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         InputStream in = super.getInputStream();
-        InputStreamReader reader = new InputStreamReader(in);
+        InputStreamReader reader = new InputStreamReader(in, Charset.forName("UTF-8"));
         BufferedReader buffer = new BufferedReader(reader);
 
         // use for store data from buffer
