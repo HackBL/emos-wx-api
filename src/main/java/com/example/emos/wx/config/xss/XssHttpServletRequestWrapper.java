@@ -2,9 +2,15 @@ package com.example.emos.wx.config.xss;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
+import cn.hutool.json.JSONUtil;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,7 +51,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public Map<String, String[]> getParameterMap() {
         Map<String, String[]> parameters = super.getParameterMap();
-        // Insertion order using LinkedHashMap
+        // Use for store filtered values
         Map<String, String[]> map = new LinkedHashMap<>();
         if (parameters != null) {
             for (String key: parameters.keySet()) {
@@ -74,5 +80,28 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
         
         return value;
+    }
+
+    @Override
+    public ServletInputStream getInputStream() throws IOException {
+        InputStream in = super.getInputStream();
+        InputStreamReader reader = new InputStreamReader(in);
+        BufferedReader buffer = new BufferedReader(reader);
+
+        // use for store data from buffer
+        StringBuffer sb = new StringBuffer();
+
+        String line = buffer.readLine();
+        while (line != null) {
+            sb.append(line);
+            line = buffer.readLine();
+        }
+
+        // close all streams
+        buffer.close();
+        reader.close();
+        in.close();
+
+        return null;
     }
 }
