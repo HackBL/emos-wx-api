@@ -5,6 +5,8 @@ import cn.hutool.http.HtmlUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     public XssHttpServletRequestWrapper(HttpServletRequest request) {
@@ -38,5 +40,29 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
 
         return values;
+    }
+
+    @Override
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> parameters = super.getParameterMap();
+        // Insertion order using LinkedHashMap
+        Map<String, String[]> map = new LinkedHashMap<>();
+        if (parameters != null) {
+            for (String key: parameters.keySet()) {
+                String[] values = parameters.get(key);
+
+                // Iterate arr and filter each value to prevent XSS Attack
+                for (int i = 0; i < values.length; i++) {
+                    String value = values[i];
+                    if (!StrUtil.hasEmpty(values)) {
+                        value = HtmlUtil.filter(value);
+                    }
+                    values[i] = value;
+                }
+                map.put(key, values);
+            }
+        }
+
+        return map;
     }
 }
