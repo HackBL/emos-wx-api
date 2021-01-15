@@ -14,11 +14,29 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
         String value = super.getParameter(name);
-        // Convert data
+        // filter value to prevent XSS Attack
         if (!StrUtil.hasEmpty(value)) {
             value = HtmlUtil.filter(value);
         }
 
         return value;
+    }
+
+    @Override
+    public String[] getParameterValues(String name) {
+        String[] values = super.getParameterValues(name);
+
+        if(values != null) {
+            // Iterate arr and filter each value to prevent XSS Attack
+            for (int i = 0; i < values.length; i++) {
+                String value = values[i];
+                if (!StrUtil.hasEmpty(values)) {
+                    value = HtmlUtil.filter(value);
+                }
+                values[i] = value;
+            }
+        }
+
+        return values;
     }
 }
