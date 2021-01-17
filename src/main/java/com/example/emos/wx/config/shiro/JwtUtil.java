@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,6 @@ public class JwtUtil {
     @Value("${emos.jwt.expire}")
     private int expire;
 
-    // generate Tokens with userId & secret & expire
     public String createToken(int userId) {
         // shift expiration date from cur date
         Date date = DateUtil.offset(new Date(), DateField.DAY_OF_YEAR, expire).toJdkDate();
@@ -32,11 +32,18 @@ public class JwtUtil {
         return builder.withClaim("userId", userId).withExpiresAt(date).sign(algorithm);
     }
 
-    // get userId with token
     public int getUserId(String token) {
         // decode token to get userId
         DecodedJWT decode =  JWT.decode(token);
         return decode.getClaim("userId").asInt();
     }
 
+    public void verifierToken(String token) {
+        // verify the token with secret
+        // check if token was encoded by secret
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        // Throw runtime exception if failed
+        verifier.verify(token);
+    }
 }
