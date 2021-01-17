@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,13 @@ public class JwtUtil {
         // using inner class to generate tokens
         JWTCreator.Builder builder= JWT.create();
         return builder.withClaim("userId", userId).withExpiresAt(date).sign(algorithm);
+    }
+
+    // get userId with token
+    public int getUserId(String token) {
+        // decode token to get userId
+        DecodedJWT decode =  JWT.decode(token);
+        return decode.getClaim("userId").asInt();
     }
 
 }
