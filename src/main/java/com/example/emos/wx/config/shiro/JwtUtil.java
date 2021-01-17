@@ -7,6 +7,7 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.emos.wx.exception.EmosException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,12 @@ public class JwtUtil {
 
     public int getUserId(String token) {
         // decode token to get userId
-        DecodedJWT decode =  JWT.decode(token);
-        return decode.getClaim("userId").asInt();
+        try {
+            DecodedJWT decode = JWT.decode(token);
+            return decode.getClaim("userId").asInt();
+        } catch (Exception e) {
+            throw new EmosException("令牌无效");
+        }
     }
 
     public void verifierToken(String token) {
