@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -38,6 +39,17 @@ public class OAuth2Filter extends AuthenticatingFilter {
         }
         // encapsulate Token String to Token Object passing to Shiro
         return new OAuth2Token(token);
+    }
+
+    /**
+     *  All requests but Options should be processed by Shiro
+     *  True if Options request
+     *  False if other requests
+     * */
+    @Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+        HttpServletRequest req = (HttpServletRequest) request;
+        return req.getMethod().equals(RequestMethod.OPTIONS.name());
     }
 
     @Override
