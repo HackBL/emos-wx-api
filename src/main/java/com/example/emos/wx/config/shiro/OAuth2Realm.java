@@ -6,11 +6,15 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class OAuth2Realm extends AuthorizingRealm{
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
     public boolean supports(AuthenticationToken token) {
-        return super.supports(token);
+        return token instanceof OAuth2Token;
     }
 
     @Override
