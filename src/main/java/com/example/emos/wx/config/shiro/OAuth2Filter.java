@@ -30,8 +30,14 @@ public class OAuth2Filter extends AuthenticatingFilter {
     private RedisTemplate redisTemplate;
 
     @Override
-    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
-        return null;
+    protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
+        HttpServletRequest req = (HttpServletRequest) request;
+        String token = getRequestToken(req);
+        if (StrUtil.isBlank(token)) {
+            return null;
+        }
+        // encapsulate Token String to Token Object passing to Shiro
+        return new OAuth2Token(token);
     }
 
     @Override
