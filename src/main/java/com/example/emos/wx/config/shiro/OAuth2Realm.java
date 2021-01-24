@@ -11,6 +11,11 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ *  Shiro Framework
+ *  Authorization and Authentication of tokens
+ * */
+
 @Component
 public class OAuth2Realm extends AuthorizingRealm{
     @Autowired

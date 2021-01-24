@@ -14,6 +14,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ *  Intercept Http Requests
+ *
+ * */
+
 @Component
 @Scope("prototype")     // 在springboot中属于多例java类， 非单例类
 public class OAuth2Filter extends AuthenticatingFilter {
@@ -30,6 +35,9 @@ public class OAuth2Filter extends AuthenticatingFilter {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    /**
+     *  拦截请求之后，用于把Token字符串封装成Token对象
+     * */
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
         HttpServletRequest req = (HttpServletRequest) request;
@@ -37,23 +45,24 @@ public class OAuth2Filter extends AuthenticatingFilter {
         if (StrUtil.isBlank(token)) {
             return null;
         }
-        // encapsulate Token String to Token Object passing to Shiro
         return new OAuth2Token(token);
     }
 
     /**
-     *  All requests but Options should be processed by Shiro
-     *  True if Options request
-     *  False if other requests
+     *  拦截请求，判断请求是否需要被Shiro处理
      * */
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         HttpServletRequest req = (HttpServletRequest) request;
-        return req.getMethod().equals(RequestMethod.OPTIONS.name());
+        if (req.getMethod().equals(RequestMethod.OPTIONS.name())) {
+            return true;
+        }
+        // 除了Options请求之外，所有请求都要被Shiro处理
+        return false;
     }
 
     @Override
-    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         return false;
     }
 
