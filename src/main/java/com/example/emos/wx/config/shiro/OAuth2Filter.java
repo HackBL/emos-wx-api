@@ -1,6 +1,8 @@
 package com.example.emos.wx.config.shiro;
 
 import cn.hutool.core.util.StrUtil;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.apache.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
@@ -15,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  Intercept Http Requests
@@ -81,12 +84,39 @@ public class OAuth2Filter extends AuthenticatingFilter {
         threadLocalToken.clear();
 
         String token = getRequestToken(req);
+
+        // Response error to the client if the request has a blank token
         if (StrUtil.isBlank(token)) {
             resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
             resp.getWriter().print("无效的令牌");
             return false;
         }
 
+        try {
+            jwtUtil.verifierToken(token);
+        } catch (TokenExpiredException e) {    // 令牌过期
+            // 刷新令牌
+            if (redisTemplate.hasKey(token)) {
+                // 刷新并生成新令牌
+                redisTemplate.delete(token);
+                int userId = jwtUtil.getUserId(token);
+                token = jwtUtil.createToken(userId);
+                // 新的令牌存到 Redis & ThreadLocal 中
+                redisTemplate.opsForValue().set(token, userId+"", cacheExpire, TimeUnit.DAYS);
+                threadLocalToken.setToken(token);
+            }
+            // 客户端重新登录
+            else {
+                resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+                resp.getWriter().print("令牌已过期");
+                return false;
+            }
+        } catch (JWTDecodeException e) {    // Token字符串内容有问题
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.getWriter().print("无效的令牌");
+            return false;
+        }
+        
         return false;
     }
 
