@@ -14,10 +14,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -156,5 +159,13 @@ public class OAuth2Filter extends AuthenticatingFilter {
             token = request.getParameter("token");
         }
         return token;
+    }
+
+    /**
+     *  掌管拦截request和response
+     * */
+    @Override
+    public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+        super.doFilterInternal(request, response, chain);
     }
 }
