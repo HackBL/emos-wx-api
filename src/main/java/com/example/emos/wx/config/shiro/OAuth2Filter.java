@@ -77,7 +77,16 @@ public class OAuth2Filter extends AuthenticatingFilter {
         // 允许跨域请求
         resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
-        
+
+        threadLocalToken.clear();
+
+        String token = getRequestToken(req);
+        if (StrUtil.isBlank(token)) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.getWriter().print("无效的令牌");
+            return false;
+        }
+
         return false;
     }
 
