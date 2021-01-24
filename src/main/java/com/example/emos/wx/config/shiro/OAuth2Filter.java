@@ -1,6 +1,7 @@
 package com.example.emos.wx.config.shiro;
 
 import cn.hutool.core.util.StrUtil;
+import org.apache.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *  Intercept Http Requests
@@ -61,8 +63,21 @@ public class OAuth2Filter extends AuthenticatingFilter {
         return false;
     }
 
+    /**
+     *  该方法用于处理所有应该被Shiro处理的请求
+     * */
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
+
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+
+        // 允许跨域请求
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+        
         return false;
     }
 
