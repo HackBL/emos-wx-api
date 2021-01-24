@@ -14,6 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ *  Create "token string"
+ *  Verify token's effectiveness such as content info & expiration
+ * */
+
 @Component
 @Slf4j
 public class JwtUtil {
@@ -23,6 +28,7 @@ public class JwtUtil {
     @Value("${emos.jwt.expire}")
     private int expire;
 
+    // response to Client
     public String createToken(int userId) {
         // shift expiration date from cur date
         Date date = DateUtil.offset(new Date(), DateField.DAY_OF_YEAR, expire).toJdkDate();
@@ -43,8 +49,8 @@ public class JwtUtil {
         }
     }
 
+    // 验证token有效性， 内容是否正确和是否过期
     public void verifierToken(String token) {
-        // verify the token with secret
         // check if token was encoded by secret
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm).build();
