@@ -116,8 +116,11 @@ public class OAuth2Filter extends AuthenticatingFilter {
             resp.getWriter().print("无效的令牌");
             return false;
         }
-        
-        return false;
+
+        // 执行Realm来进行Token认证与授权
+        // 间接调用Realm
+        boolean bool= executeLogin(request, response);
+        return bool;
     }
 
     private String getRequestToken(HttpServletRequest request) {
