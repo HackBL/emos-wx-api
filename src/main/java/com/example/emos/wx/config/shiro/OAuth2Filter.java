@@ -122,7 +122,7 @@ public class OAuth2Filter extends AuthenticatingFilter {
         // 间接调用Realm来进行Token认证与授权
         // 如果返回false, 认证或授权失败
         // executeLogin将触发onLoginFailure
-        boolean bool= executeLogin(request, response);
+        boolean bool = executeLogin(request, response);
         return bool;
     }
 
