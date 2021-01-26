@@ -3,6 +3,7 @@ package com.example.emos.wx.config.shiro;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -68,5 +69,18 @@ public class ShiroConfig {
     @Bean("lifecycleBeanPostProcessor")
     public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
         return new LifecycleBeanPostProcessor();
+    }
+
+    /**
+     *  AOP切面类
+     *  Web方法执行前，进行验证权限 (调用web方法满足什么样的角色或权限)
+     *     - 在执行web方法的时候，给方法加上注解(权限验证的注解)
+     *     - 加上注解后，方法在执行前，会被AOP拦截下来，验证是否满足权限
+     * */
+    @Bean("authorizationAttributeSourceAdvisor")
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
+        advisor.setSecurityManager(securityManager);
+        return advisor;
     }
 }
