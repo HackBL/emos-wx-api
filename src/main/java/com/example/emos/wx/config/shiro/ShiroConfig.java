@@ -2,6 +2,7 @@ package com.example.emos.wx.config.shiro;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,10 @@ public class ShiroConfig {
         return securityManager;
     }
 
+    /**
+     *  1. 用于封装Filter类对象，
+     *  2. 设置Filter拦截路径
+     * */
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager, OAuth2Filter filter) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
@@ -55,5 +60,13 @@ public class ShiroConfig {
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 
         return shiroFilter;
+    }
+
+    /**
+     *  管理Shiro对象生命周期
+     * */
+    @Bean("lifecycleBeanPostProcessor")
+    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
     }
 }
