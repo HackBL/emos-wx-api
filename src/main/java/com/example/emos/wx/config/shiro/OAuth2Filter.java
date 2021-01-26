@@ -24,14 +24,13 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  Intercept Http Requests
+ *  客户端发起请求被拦截
  *
  * */
 
 @Component
 @Scope("prototype")     // 在springboot中属于多例java类， 非单例类
 public class OAuth2Filter extends AuthenticatingFilter {
-
     @Autowired
     private ThreadLocalToken threadLocalToken;
 
