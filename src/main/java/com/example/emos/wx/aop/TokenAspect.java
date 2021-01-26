@@ -11,5 +11,9 @@ import org.springframework.stereotype.Component;
 public class TokenAspect {
     @Autowired
     private ThreadLocalToken threadLocalToken;
-    
+
+    @Pointcut("execution(public * com.example.emos.wx.controller.*.*(..))")
+    public void aspect() {
+
+    }
 }
