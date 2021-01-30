@@ -10,4 +10,6 @@ public interface TbUserDao {
     public boolean haveRootUser();
 
     public int insert(HashMap param);
+
+    public Integer searchIdByOpenId(String openID);
 }
