@@ -4,7 +4,9 @@
     <select id="haveRootUser" resultType="boolean">
         SELECT IF(COUNT(*), TRUE, FALSE) FROM tb_user WHERE root=1;
     </select>
-
+    <select id="searchIdByOpenId" parameterType="String" resultType="Integer">
+        SELECT id FROM tb_user WHERE open_id=#{openId} AND status=1;
+    </select>
     <insert id="insert" parameterType="HashMap">
         INSERT INTO tb_user
         SET
