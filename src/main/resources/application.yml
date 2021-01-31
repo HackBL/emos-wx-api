@@ -68,3 +68,7 @@ emos:
     expire:  5
     #token cache expiration（days）
     cache-expire: 10
+
+wx:
+  app-id: xxx
+  app-secret: xxx
