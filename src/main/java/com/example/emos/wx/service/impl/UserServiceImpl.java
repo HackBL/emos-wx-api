@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
-
+import java.util.Set;
 
 
 @Service
@@ -89,5 +89,11 @@ public class UserServiceImpl implements UserService {
 
         }
         return 0;
+    }
+
+    @Override
+    public Set<String> searchUserPermissions(int userId) {
+        Set<String> permissions = userDao.searchUserPermissions(userId);
+        return permissions;
     }
 }
