@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/user")
 @Api("用户模块Web接口")
@@ -24,4 +26,8 @@ public class userController {
 
     @Value("${emos.jwt.cache-expire}")
     private int cacheExpire;
+
+    private void saveCacheToken(String token, int userId) {
+        redisTemplate.opsForValue().set(token, userId+"", cacheExpire, TimeUnit.DAYS);
+    }
 }
