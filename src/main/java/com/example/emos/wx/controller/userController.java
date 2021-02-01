@@ -45,7 +45,7 @@ public class userController {
         String token = jwtUtil.createToken(id);
         Set<String> permsSet = userService.searchUserPermissions(id);
         saveCacheToken(token, id);
-
+        
         return R.ok("用户注册成功").put("token", token).put("permission", permsSet);
     }
 
