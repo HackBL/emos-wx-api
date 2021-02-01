@@ -53,6 +53,6 @@ public class userController {
      *  Save token into Redis
      * */
     private void saveCacheToken(String token, int userId) {
-        redisTemplate.opsForValue().set(token, userId+"", cacheExpire, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(token, userId + "", cacheExpire, TimeUnit.DAYS);
     }
 }
