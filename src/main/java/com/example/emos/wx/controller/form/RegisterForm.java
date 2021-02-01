@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 
 @ApiModel
 @Data
-public class registerForm {
+public class RegisterForm {
     @NotBlank(message = "激活码不能为空")
     @Pattern(regexp = "^[0-9]{6}$", message = "注册码必须是6位数字")
     private String registerCode;
