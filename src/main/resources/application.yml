@@ -72,4 +72,6 @@ emos:
 wx:
   app-id: xxx
   app-secret: xxx
-  super-admin: 000000
+
+admin:
+  super-admin: "000000"

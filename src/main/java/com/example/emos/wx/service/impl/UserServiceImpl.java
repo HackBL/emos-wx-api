@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Value("${wx.app-secret}")
     private String appSecret;
 
-    @Value("${wx.super-admin}")
+    @Value("${admin.super-admin}")
     private String superAdmin;
 
     @Autowired
