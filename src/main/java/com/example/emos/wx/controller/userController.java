@@ -30,7 +30,7 @@ public class userController {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
+    
     @Value("${emos.jwt.cache-expire}")
     private int cacheExpire;
 
