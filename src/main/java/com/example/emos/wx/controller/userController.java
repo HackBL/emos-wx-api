@@ -41,10 +41,10 @@ public class userController {
     @PostMapping("/register")
     @ApiOperation("注册用户")
     public R register(@Valid @RequestBody RegisterForm form) {
-        int id = userService.registerUser(form.getRegisterCode(), form.getCode(), form.getNickname(), form.getPhoto());
-        String token = jwtUtil.createToken(id);
-        Set<String> permsSet = userService.searchUserPermissions(id);
-        saveCacheToken(token, id);
+        int userId = userService.registerUser(form.getRegisterCode(), form.getCode(), form.getNickname(), form.getPhoto());
+        String token = jwtUtil.createToken(userId);
+        Set<String> permsSet = userService.searchUserPermissions(userId);
+        saveCacheToken(token, userId);
         
         return R.ok("用户注册成功").put("token", token).put("permission", permsSet);
     }
