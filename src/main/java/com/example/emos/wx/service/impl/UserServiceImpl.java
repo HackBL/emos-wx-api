@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      *  通过临时授权字符串，得到openId
+     *  临时授权字符串通过Weixin api来进行验证
      * */
     private String getOpenId(String code) {
         String url = "https://api.weixin.qq.com/sns/jscode2session";
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int registerUser(String registerCode, String code, String nickname, String photo) {
-        //如果激活码是000000，代表是超级管理员
+        // 注册超级管理员
         if (registerCode.equals(superAdmin)) {
             boolean existAdmin = userDao.haveRootUser();
 
@@ -76,19 +77,32 @@ public class UserServiceImpl implements UserService {
 
                 // 传入到MySQL中
                 userDao.insert(map);
-                int id = userDao.searchIdByOpenId(openId);
-                return id;
+                int userId = userDao.searchIdByOpenId(openId);
+                return userId;
             }
             else {
                 //如果root已经绑定了，就抛出异常
                 throw new EmosException("无法绑定超级管理员账号");
             }
         }
-        //TODO 此处还有其他判断内容
+        // TODO 此处还有其他判断内容
         else {
 
         }
         return 0;
+    }
+
+    @Override
+    public Integer login(String code) {
+        String openId = getOpenId(code);
+        Integer userId = userDao.searchIdByOpenId(openId);
+
+        if (userId == null) {
+            throw new EmosException("账户不存在");
+        }
+
+        // TODO 从消息队列中接收消息，转移到消息表: 用户登陆后，得到未读消息
+        return userId;
     }
 
     @Override
