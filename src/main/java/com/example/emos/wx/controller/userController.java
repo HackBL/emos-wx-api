@@ -2,6 +2,7 @@ package com.example.emos.wx.controller;
 
 import com.example.emos.wx.common.util.R;
 import com.example.emos.wx.config.shiro.JwtUtil;
+import com.example.emos.wx.controller.form.LoginForm;
 import com.example.emos.wx.controller.form.RegisterForm;
 import com.example.emos.wx.service.UserService;
 import io.swagger.annotations.Api;
@@ -34,7 +35,6 @@ public class userController {
     @Value("${emos.jwt.cache-expire}")
     private int cacheExpire;
 
-
     /**
      *  Process register request
      * */
@@ -47,6 +47,20 @@ public class userController {
         saveCacheToken(token, userId);
         
         return R.ok("用户注册成功").put("token", token).put("permission", permsSet);
+    }
+
+    /**
+     *  Process login request
+     * */
+    @PostMapping("/login")
+    @ApiOperation("登陆系统")
+    public R login(@Valid @RequestBody LoginForm form) {
+        int userId = userService.login(form.getCode());
+        String token = jwtUtil.createToken(userId);
+        Set<String> permsSet = userService.searchUserPermissions(userId);
+        saveCacheToken(token, userId);
+
+        return R.ok("登陆成功").put("token", token).put("permission", permsSet);
     }
 
     /**
