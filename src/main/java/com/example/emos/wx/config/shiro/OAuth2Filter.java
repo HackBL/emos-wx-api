@@ -150,6 +150,14 @@ public class OAuth2Filter extends AuthenticatingFilter {
         return false;
     }
 
+    /**
+     *  掌管拦截request和response
+     * */
+    @Override
+    public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+        super.doFilterInternal(request, response, chain);
+    }
+
     private String getRequestToken(HttpServletRequest request) {
         // get token from request header
         String token = request.getHeader("token");
@@ -158,13 +166,5 @@ public class OAuth2Filter extends AuthenticatingFilter {
             token = request.getParameter("token");
         }
         return token;
-    }
-
-    /**
-     *  掌管拦截request和response
-     * */
-    @Override
-    public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
-        super.doFilterInternal(request, response, chain);
     }
 }

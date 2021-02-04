@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbUserDao">
     <select id="haveRootUser" resultType="boolean">
-        SELECT IF(COUNT(*), TRUE, FALSE) FROM tb_user WHERE root=1;
+        SELECT IF(COUNT(*), TRUE, FALSE) FROM tb_user WHERE root = 1;
     </select>
     <select id="searchIdByOpenId" parameterType="String" resultType="Integer">
-        SELECT id FROM tb_user WHERE open_id=#{openId} AND status=1;
+        SELECT id FROM tb_user WHERE open_id=#{openId} AND status = 1
     </select>
     <select id="searchUserPermissions" parameterType="int" resultType="String">
         SELECT p.permission_name
@@ -38,7 +38,7 @@
             tel = #{tel},
         </if>
         <if test="email!=null">
-            email=#{email},
+            email = #{email},
         </if>
         <if test="hiredate!=null">
             hiredate = #{hiredate},

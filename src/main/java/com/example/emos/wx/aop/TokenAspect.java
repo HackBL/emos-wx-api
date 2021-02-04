@@ -15,6 +15,9 @@ public class TokenAspect {
     @Autowired
     private ThreadLocalToken threadLocalToken;
 
+    /**
+     *  拦截所有web方法的返回值
+     * */
     @Pointcut("execution(public * com.example.emos.wx.controller.*.*(..))")
     public void aspect() {
 
