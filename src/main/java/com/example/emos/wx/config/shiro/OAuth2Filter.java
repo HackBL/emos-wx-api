@@ -107,7 +107,7 @@ public class OAuth2Filter extends AuthenticatingFilter {
                 threadLocalToken.setToken(token);
             }
             // 客户端重新登录
-            else {
+            else {  // 客户端 & Redis不存在Token
                 resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 resp.getWriter().print("令牌已过期");
                 return false;

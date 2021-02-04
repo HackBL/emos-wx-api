@@ -95,6 +95,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer login(String code) {
         String openId = getOpenId(code);
+        // 调用MySQL，通过openId，return id
         Integer userId = userDao.searchIdByOpenId(openId);
 
         if (userId == null) {
