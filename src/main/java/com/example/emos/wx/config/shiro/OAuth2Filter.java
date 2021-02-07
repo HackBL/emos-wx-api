@@ -95,7 +95,8 @@ public class OAuth2Filter extends AuthenticatingFilter {
 
         try {
             jwtUtil.verifierToken(token);
-        } catch (TokenExpiredException e) {    // 令牌过期
+        // 令牌过期
+        } catch (TokenExpiredException e) {
             // 刷新令牌
             if (redisTemplate.hasKey(token)) {
                 // 刷新并生成新令牌
@@ -112,7 +113,8 @@ public class OAuth2Filter extends AuthenticatingFilter {
                 resp.getWriter().print("令牌已过期");
                 return false;
             }
-        } catch (JWTDecodeException e) {    // Token字符串内容有问题
+        // Token字符串内容有问题
+        } catch (Exception e) {
             resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
             resp.getWriter().print("无效的令牌");
             return false;
