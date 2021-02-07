@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbUserDao">
+<!--    判断超级管理员是否已经存在-->
     <select id="haveRootUser" resultType="boolean">
         SELECT IF(COUNT(*), TRUE, FALSE) FROM tb_user WHERE root = 1;
     </select>
+<!--    查找当前用户的userId-->
     <select id="searchIdByOpenId" parameterType="String" resultType="Integer">
         SELECT id FROM tb_user WHERE open_id=#{openId} AND status = 1
     </select>
+<!--    查找当前用户的权限-->
     <select id="searchUserPermissions" parameterType="int" resultType="String">
         SELECT p.permission_name
         FROM tb_user u
@@ -16,6 +19,14 @@
             ON JSON_CONTAINS(r.permissions, CAST(p.id AS CHAR))
         WHERE u.id = #{userId} AND u.status = 1;
     </select>
+<!--    通过userId, 查询用户信息-->
+    <select id="searchById" parameterType="int" resultType="com.example.emos.wx.db.pojo.TbUser">
+        SELECT
+            id, open_id, nickname, photo, name, sex, tel, role, root, dept_id, status, create_time
+        FROM tb_user
+        WHERE id = #{userId} AND status = 1
+    </select>
+<!--    用户注册，传入信息-->
     <insert id="insert" parameterType="HashMap">
         INSERT INTO tb_user
         SET
