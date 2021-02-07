@@ -9,7 +9,7 @@
     <select id="searchIdByOpenId" parameterType="String" resultType="Integer">
         SELECT id FROM tb_user WHERE open_id=#{openId} AND status = 1
     </select>
-<!--    查找当前用户的权限-->
+<!--    查找当前用户的权限列表-->
     <select id="searchUserPermissions" parameterType="int" resultType="String">
         SELECT p.permission_name
         FROM tb_user u
