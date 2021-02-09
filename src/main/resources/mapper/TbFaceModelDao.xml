@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbFaceModelDao">
-
+<!--  通过userId查询人脸模型-->
+  <select id="searchFaceModel" parameterType="int" resultType="string">
+    SElECT face_model
+    FROM tb_face_model
+    WHERE user_id = #{userId}
+  </select>
+<!--  传入userId和对应的人脸模型-->
+  <insert id="insertFaceModel" parameterType="com.example.emos.wx.db.pojo.TbFaceModel">
+    INSERT INTO tb_face_model
+    SET user_id = #{userId},
+        face_model = #{faceModel}
+  </insert>
+  <delete id="deleteFaceModel" parameterType="int">
+    DELETE FROM tb_face_model
+    WHERE user_id = #{userId}
+  </delete>
 </mapper>
