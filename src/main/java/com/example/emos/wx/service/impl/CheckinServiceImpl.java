@@ -3,17 +3,20 @@ package com.example.emos.wx.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.example.emos.wx.config.SystemConstants;
-import com.example.emos.wx.db.dao.TbCheckinDao;
-import com.example.emos.wx.db.dao.TbFaceModelDao;
-import com.example.emos.wx.db.dao.TbHolidaysDao;
-import com.example.emos.wx.db.dao.TbWorkdayDao;
+import com.example.emos.wx.db.dao.*;
+import com.example.emos.wx.db.pojo.TbCheckin;
 import com.example.emos.wx.exception.EmosException;
 import com.example.emos.wx.service.CheckinService;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -39,6 +42,9 @@ public class CheckinServiceImpl implements CheckinService {
 
     @Autowired
     private TbFaceModelDao faceModelDao;
+
+    @Autowired
+    private TbCityDao cityDao;
 
     @Value("${emos.face.createFaceModelUrl}")
     private String createFaceModelUrl;
@@ -143,12 +149,55 @@ public class CheckinServiceImpl implements CheckinService {
                 throw new EmosException("签到无效，非本人签到");
             }
             else if (body.equals("True")) {
-                // TODO 查询疫情风险等级
-                // TODO 保存签到记录
+                // 查询疫情风险等级
+                int risk = 1; // 1: low risk, 2: medium risk, 3: high risk
+                String city = (String) param.get("city");
+                String district = (String) param.get("district");
+
+                if (!StrUtil.isBlank(city) && !StrUtil.isBlank(district)) {
+                    String code = cityDao.searchCode(city);
+
+                    // Access bendibao via jsoup to get risk level
+                    try {
+                        String url = "http://m." + code + ".bendibao.com/news/yqdengji/?qu=" + district;
+                        Document document = Jsoup.connect(url).get();
+                        Elements elements = document.getElementsByClass("list-content");
+                        if (elements.size() > 0) {
+                            Element element = elements.get(0);
+                            String result = element.select("p:last-child").text();
+
+                            if (result.equals("高风险")) {
+                                risk = 3;
+                                // TODO 发送告警邮件
+                            }
+                            else if (result.equals("中风险")) {
+                                risk = 2;
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        log.error("执行异常", e);
+                        throw new EmosException("获取风险等级失败");
+                    }
+                }
+
+                // 保存签到记录
+                String address = (String) param.get("address");
+                String country = (String) param.get("country");
+                String province = (String) param.get("province");
+
+                TbCheckin entity = new TbCheckin();
+                entity.setId(userId);
+                entity.setAddress(address);
+                entity.setCountry(country);
+                entity.setProvince(province);
+                entity.setCity(city);
+                entity.setDistrict(district);
+                entity.setStatus((byte) status);
+                entity.setDate(DateUtil.today());   // include date without time
+                entity.setCreateTime(now);
+                checkinDao.insertCheckin(entity);
             }
-
         }
-
-
     }
 }
