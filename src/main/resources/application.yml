@@ -68,6 +68,9 @@ emos:
     expire:  5
     #token cache expiration（days）
     cache-expire: 10
+  face:
+    createFaceModelUrl: http://192.168.0.101:3000/create_face_model
+    checkinUrl: http://192.168.0.101:3000/checkin
 
 wx:
   app-id: xxx
