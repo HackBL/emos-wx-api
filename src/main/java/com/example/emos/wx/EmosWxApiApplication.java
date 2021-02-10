@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
@@ -17,6 +18,7 @@ import java.util.List;
 @SpringBootApplication
 @ServletComponentScan
 @Slf4j
+@EnableAsync    // 开启异步多线程执行
 public class EmosWxApiApplication {
     @Autowired
     private SysConfigDao sysConfigDao;
