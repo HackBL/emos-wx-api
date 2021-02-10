@@ -111,12 +111,11 @@ public class CheckinServiceImpl implements CheckinService {
     @Override
     public void checkin(HashMap param) {
         DateTime now = DateUtil.date();
-        DateTime start = DateUtil.parse(DateUtil.today() + " " + constants.attendanceStartTime);
         DateTime attend = DateUtil.parse(DateUtil.today() + " " + constants.attendanceTime);
         DateTime end = DateUtil.parse(DateUtil.today() + " " + constants.attendanceEndTime);
         int status = 1; // 1: on time, 2: late
 
-        if (now.isBeforeOrEquals(attend) && now.isAfterOrEquals(start)) {       // TODO Pending
+        if (now.isBeforeOrEquals(attend)) {       
             status = 1;
         }
         else if (now.isAfter(attend) && now.isBefore(end)) {
