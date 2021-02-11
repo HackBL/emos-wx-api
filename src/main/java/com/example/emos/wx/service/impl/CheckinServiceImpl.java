@@ -126,7 +126,7 @@ public class CheckinServiceImpl implements CheckinService {
         String faceModel = faceModelDao.searchFaceModel(userId);
 
         if (faceModel == null) {    // no faceModel from DB on cur user
-            throw new EmosException("不存在人脸模型"); // TODO Pending
+            throw new EmosException("不存在人脸模型");
         }
         else {
             String path = (String) param.get("path");
