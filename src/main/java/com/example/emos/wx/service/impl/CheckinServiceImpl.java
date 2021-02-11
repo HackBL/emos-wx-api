@@ -12,6 +12,7 @@ import com.example.emos.wx.db.dao.*;
 import com.example.emos.wx.db.pojo.TbCheckin;
 import com.example.emos.wx.exception.EmosException;
 import com.example.emos.wx.service.CheckinService;
+import com.example.emos.wx.task.EmailTask;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,8 +21,10 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 
 @Service
@@ -46,11 +49,21 @@ public class CheckinServiceImpl implements CheckinService {
     @Autowired
     private TbCityDao cityDao;
 
+    @Autowired
+    private TbUserDao userDao;
+
     @Value("${emos.face.createFaceModelUrl}")
     private String createFaceModelUrl;
 
     @Value("${emos.face.checkinUrl}")
     private String checkinUrl;
+
+    @Value("${emos.email.hr}")
+    private String hrEmail;
+
+    @Autowired
+    private EmailTask emailTask;
+
 
     /**
      *  判断当前时间是否可以checkin
@@ -106,7 +119,9 @@ public class CheckinServiceImpl implements CheckinService {
     }
 
     /**
+     *  在签到时间内进行签到
      *  判断签到用户是否存在人脸模型
+     *  实现发送告警邮件
      * */
     @Override
     public void checkin(HashMap param) {
@@ -150,6 +165,9 @@ public class CheckinServiceImpl implements CheckinService {
             else if (body.equals("True")) {
                 // 查询疫情风险等级
                 int risk = 1; // 1: low risk, 2: medium risk, 3: high risk
+                String address = (String) param.get("address");
+                String country = (String) param.get("country");
+                String province = (String) param.get("province");
                 String city = (String) param.get("city");
                 String district = (String) param.get("district");
 
@@ -167,13 +185,21 @@ public class CheckinServiceImpl implements CheckinService {
 
                             if (result.equals("高风险")) {
                                 risk = 3;
-                                // TODO 发送告警邮件
+                                // 发送告警邮件
+                                HashMap<String, String> map = userDao.searchNameAndDept(userId);
+                                String name = map.get("name");
+                                String deptName = map.get("dept_name");
+                                deptName = deptName != null ? deptName : "";
+
+                                SimpleMailMessage message = new SimpleMailMessage();
+                                message.setTo(hrEmail);
+                                message.setSubject("员工" + name + "身处高风险疫情地区警告");
+                                message.setText(deptName + "员工" + "," + DateUtil.format(new Date(), "MM/dd/yyyy") + "处于" + address + "，属于新冠疫情高风险地区，请及时与该员工联系，核实情况！");
                             }
                             else if (result.equals("中风险")) {
                                 risk = 2;
                             }
                         }
-
                     } catch (Exception e) {
                         log.error("执行异常", e);
                         throw new EmosException("获取风险等级失败");
@@ -181,10 +207,6 @@ public class CheckinServiceImpl implements CheckinService {
                 }
 
                 // 保存签到记录
-                String address = (String) param.get("address");
-                String country = (String) param.get("country");
-                String province = (String) param.get("province");
-
                 TbCheckin entity = new TbCheckin();
                 entity.setId(userId);
                 entity.setAddress(address);
