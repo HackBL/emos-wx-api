@@ -10,6 +10,7 @@ import cn.hutool.http.HttpUtil;
 import com.example.emos.wx.config.SystemConstants;
 import com.example.emos.wx.db.dao.*;
 import com.example.emos.wx.db.pojo.TbCheckin;
+import com.example.emos.wx.db.pojo.TbFaceModel;
 import com.example.emos.wx.exception.EmosException;
 import com.example.emos.wx.service.CheckinService;
 import com.example.emos.wx.task.EmailTask;
@@ -87,7 +88,7 @@ public class CheckinServiceImpl implements CheckinService {
         }
 
         // 当天是节假日
-        if (type.equals("节假日")) {
+        if ("节假日".equals(type)) {
             return "节假日不需要考勤";
         }
         // 当天是工作日
@@ -120,7 +121,7 @@ public class CheckinServiceImpl implements CheckinService {
 
     /**
      *  在签到时间内进行签到
-     *  判断签到用户是否存在人脸模型
+     *  判断签到用户表是否存在人脸模型
      *  实现发送告警邮件
      * */
     @Override
@@ -156,13 +157,13 @@ public class CheckinServiceImpl implements CheckinService {
 
             // Result of Response by Python
             String body = response.body();
-            if (body.equals("无法识别出人脸") || body.equals("照片中存在多张人脸")) {
+            if ("无法识别出人脸".equals(body) || "照片中存在多张人脸".equals(body)) {
                 throw new EmosException(body);
             }
-            else if (body.equals("False")) {
+            else if ("False".equals(body)) {
                 throw new EmosException("签到无效，非本人签到");
             }
-            else if (body.equals("True")) {
+            else if ("True".equals(body)) {
                 // 查询疫情风险等级
                 int risk = 1; // 1: low risk, 2: medium risk, 3: high risk
                 String address = (String) param.get("address");
@@ -183,7 +184,7 @@ public class CheckinServiceImpl implements CheckinService {
                             Element element = elements.get(0);
                             String result = element.select("p:last-child").text();
 
-                            if (result.equals("高风险")) {
+                            if ("高风险".equals(result)) {
                                 risk = 3;
                                 // 发送告警邮件
                                 HashMap<String, String> map = userDao.searchNameAndDept(userId);
@@ -197,7 +198,7 @@ public class CheckinServiceImpl implements CheckinService {
                                 message.setText(deptName + "员工" + "," + DateUtil.format(new Date(), "MM/dd/yyyy") + "处于" + address + "，属于新冠疫情高风险地区，请及时与该员工联系，核实情况！");
                                 emailTask.sendAsync(message);
                             }
-                            else if (result.equals("中风险")) {
+                            else if ("中风险".equals(result)) {
                                 risk = 2;
                             }
                         }
@@ -222,5 +223,25 @@ public class CheckinServiceImpl implements CheckinService {
                 checkinDao.insertCheckin(entity);
             }
         }
+    }
+
+    /**
+     *  上传人脸模型到数据库
+     * */
+    @Override
+    public void createFaceModel(int userId, String path) {
+        HttpRequest request = HttpUtil.createPost(createFaceModelUrl);  // send request to Python via HTTP
+        request.form("photo", FileUtil.file(path));
+        HttpResponse response = request.execute();
+
+        String body = response.body(); // 响应体内容
+        if ("无法识别出人脸".equals(body) || "照片中存在多张人脸".equals(body)) {
+            throw new EmosException(body);
+        }
+
+        TbFaceModel entity = new TbFaceModel();
+        entity.setUserId(userId);
+        entity.setFaceModel(body);
+        faceModelDao.insertFaceModel(entity);
     }
 }
