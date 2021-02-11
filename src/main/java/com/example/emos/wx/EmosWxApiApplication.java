@@ -6,12 +6,14 @@ import com.example.emos.wx.db.dao.SysConfigDao;
 import com.example.emos.wx.db.pojo.SysConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -26,12 +28,16 @@ public class EmosWxApiApplication {
     @Autowired
     private SystemConstants constants;
 
+    @Value("${emos.image-folder}")
+    private String imageFolder;
+
     public static void main(String[] args) {
         SpringApplication.run(EmosWxApiApplication.class, args);
     }
 
     @PostConstruct  // 在程序启动时，投入服务之前调用此方法，初始方法
     public void init() {
+        // 从持久层调取签到时间段
         List<SysConfig> list = sysConfigDao.selectAllParam();
         for (SysConfig one: list) {
             String key = one.getParamKey();
@@ -46,5 +52,8 @@ public class EmosWxApiApplication {
                 log.error("执行异常", e);
             }
         }
+
+        // 创建照片文件夹
+        new File(imageFolder).mkdirs();
     }
 }

@@ -195,6 +195,7 @@ public class CheckinServiceImpl implements CheckinService {
                                 message.setTo(hrEmail);
                                 message.setSubject("员工" + name + "身处高风险疫情地区警告");
                                 message.setText(deptName + "员工" + "," + DateUtil.format(new Date(), "MM/dd/yyyy") + "处于" + address + "，属于新冠疫情高风险地区，请及时与该员工联系，核实情况！");
+                                emailTask.sendAsync(message);
                             }
                             else if (result.equals("中风险")) {
                                 risk = 2;
@@ -215,6 +216,7 @@ public class CheckinServiceImpl implements CheckinService {
                 entity.setCity(city);
                 entity.setDistrict(district);
                 entity.setStatus((byte) status);
+                entity.setRisk(risk);
                 entity.setDate(DateUtil.today());   // include date without time
                 entity.setCreateTime(now);
                 checkinDao.insertCheckin(entity);
