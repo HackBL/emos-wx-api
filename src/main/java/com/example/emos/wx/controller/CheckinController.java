@@ -34,6 +34,7 @@ public class CheckinController {
     @Autowired
     private CheckinService checkinService;
 
+
     @GetMapping("validCanCheckIn")
     @ApiOperation("查看用户今天是否可以签到")
     public R validCanCheckIn(@RequestHeader("token") String token) {    // Retrieve token from request header
@@ -41,6 +42,7 @@ public class CheckinController {
         String result = checkinService.validCanCheckIn(userId, DateUtil.today());
         return R.ok(result);
     }
+
 
     @PostMapping("/checkin") // 上传图片，需要Post Request
     @ApiOperation("签到")
@@ -57,6 +59,7 @@ public class CheckinController {
         int userId = jwtUtil.getUserId(token);
         String path = imageFolder + "/" + fileName; // 图片路径
         try {
+            // 保存图片到path中
             file.transferTo(Paths.get(path));
             // 用户签到信息进行封装
             HashMap param = new HashMap();
@@ -76,5 +79,33 @@ public class CheckinController {
         } finally { // 签到成功后，删除路径照片
             FileUtil.del(path);
         }
+    }
+
+
+    @PostMapping("/createFaceModel")
+    @ApiOperation("创建人脸模型")
+    public R createFaceModel(@RequestParam("photo") MultipartFile file, @RequestHeader("token") String token) {
+        if (file == null) {
+            return R.error("没有上传文件");
+        }
+        // 图片格式为.jpg
+        String fileName = file.getOriginalFilename().toLowerCase();
+        if (!fileName.endsWith(".jpg")) {
+            return R.error("必须提交JPG格式图片");
+        }
+        int userId = jwtUtil.getUserId(token);
+        String path = imageFolder + "/" + fileName; // 图片路径
+        try {
+            // 保存图片到path中
+            file.transferTo(Paths.get(path));
+            checkinService.createFaceModel(userId, path);
+            return R.ok("人脸建模成功");
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new EmosException("图片保存错误");
+        } finally { // 签到成功后，删除路径照片
+            FileUtil.del(path);
+        }
+
     }
 }
