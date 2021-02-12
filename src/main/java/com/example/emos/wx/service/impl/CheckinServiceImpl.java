@@ -62,6 +62,9 @@ public class CheckinServiceImpl implements CheckinService {
     @Value("${emos.email.hr}")
     private String hrEmail;
 
+    @Value("${emos.code}")  // code to access to Python Model
+    private String code;
+
     @Autowired
     private EmailTask emailTask;
 
@@ -148,6 +151,7 @@ public class CheckinServiceImpl implements CheckinService {
             String path = (String) param.get("path");
             HttpRequest request = HttpUtil.createPost(checkinUrl); // send request to Python via HTTP
             request.form("photo", FileUtil.file(path), "targetModel", faceModel); // Both faceModel from client & DB send request to Python to analyze
+            request.form("code", code);
             HttpResponse response = request.execute();
 
             if (response.getStatus() != 200) {
@@ -232,6 +236,7 @@ public class CheckinServiceImpl implements CheckinService {
     public void createFaceModel(int userId, String path) {
         HttpRequest request = HttpUtil.createPost(createFaceModelUrl);  // send request to Python via HTTP
         request.form("photo", FileUtil.file(path));
+        request.form("code", code);
         HttpResponse response = request.execute();
 
         String body = response.body(); // 响应体内容
