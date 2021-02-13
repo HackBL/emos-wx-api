@@ -134,7 +134,7 @@ public class CheckinServiceImpl implements CheckinService {
         DateTime end = DateUtil.parse(DateUtil.today() + " " + constants.attendanceEndTime);
         int status = 1; // 1: on time, 2: late
 
-        if (now.isBeforeOrEquals(attend)) {             // TODO  修改状态
+        if (now.isBeforeOrEquals(attend)) {
             status = 1;
         }
         else if (now.isAfter(attend) && now.isBefore(end)) {
@@ -176,7 +176,6 @@ public class CheckinServiceImpl implements CheckinService {
 
                 if (!StrUtil.isBlank(city) && !StrUtil.isBlank(district)) {
                     String code = cityDao.searchCode(city);
-
                     // 调用"本地宝"得知疫情风险等级
                     try {
                         String url = "http://m." + code + ".bendibao.com/news/yqdengji/?qu=" + district;
@@ -193,11 +192,11 @@ public class CheckinServiceImpl implements CheckinService {
                                 String name = map.get("name");
                                 String deptName = map.get("dept_name");
                                 deptName = deptName != null ? deptName : "";
-
                                 SimpleMailMessage message = new SimpleMailMessage();
                                 message.setTo(hrEmail);
                                 message.setSubject("员工" + name + "身处高风险疫情地区警告");
-                                message.setText(deptName + "员工" + "," + DateUtil.format(new Date(), "MM/dd/yyyy") + "处于" + address + "，属于新冠疫情高风险地区，请及时与该员工联系，核实情况！");
+                                message.setText(deptName + "员工" + name + "，" + DateUtil.format(new Date(), "yyyy年MM月dd日") + "处于" + address + "，属于新冠疫情高风险地区，请及时与该员工联系，核实情况！");
+                                message.setSentDate(DateUtil.date());   //发送日期
                                 emailTask.sendAsync(message);
                             }
                             else if ("中风险".equals(result)) {
