@@ -22,7 +22,7 @@ public class EmailTask implements Serializable {
     @Async  // 实现方法异步执行
     public void sendAsync(SimpleMailMessage message) {
         message.setFrom(mailbox); // 发件人
-        message.setCc(mailbox); // 防止发送地址为垃圾邮件
+//        message.setCc(mailbox); // 防止发送地址为垃圾邮件
         javaMailSender.send(message); // 发送邮件
     }
 }

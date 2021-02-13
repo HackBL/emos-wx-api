@@ -7,7 +7,7 @@
     </select>
 <!--    查找当前用户的userId-->
     <select id="searchIdByOpenId" parameterType="String" resultType="Integer">
-        SELECT id FROM tb_user WHERE open_id=#{openId} AND status = 1
+        SELECT id FROM tb_user WHERE open_id = #{openId} AND status = 1
     </select>
 <!--    查找当前用户的权限列表-->
     <select id="searchUserPermissions" parameterType="int" resultType="String">
@@ -29,9 +29,9 @@
 <!--    通过userId，查询用户姓名及所在部门-->
     <select id="searchNameAndDept" parameterType="int" resultType="HashMap">
         SELECT u.name, d.dept_name
-        FROM tb_user LEFT JOIN tb_dept d
-            ON u.dept_id = d.id
-        WHERE u.id = #{userId} AMD u.status = 1
+        FROM tb_user u LEFT JOIN tb_dept d
+            ON u.id = d.id
+        WHERE u.id = #{userId} AND u.status = 1
     </select>
 <!--    用户注册，传入信息-->
     <insert id="insert" parameterType="HashMap">
