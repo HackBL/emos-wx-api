@@ -64,7 +64,7 @@ public class CheckinController {
             // 用户签到信息进行封装
             HashMap param = new HashMap();
             param.put("userId", userId);
-            param.put("path", param);
+            param.put("path", path);
             param.put("address", form.getAddress());
             param.put("country", form.getCountry());
             param.put("province", form.getProvince());
