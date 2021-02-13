@@ -134,13 +134,12 @@ public class CheckinServiceImpl implements CheckinService {
         DateTime end = DateUtil.parse(DateUtil.today() + " " + constants.attendanceEndTime);
         int status = 1; // 1: on time, 2: late
 
-        if (now.isBeforeOrEquals(attend)) {       
+        if (now.isBeforeOrEquals(attend)) {             // TODO  修改状态
             status = 1;
         }
         else if (now.isAfter(attend) && now.isBefore(end)) {
             status = 2;
         }
-
         int userId = (Integer) param.get("userId");
         String faceModel = faceModelDao.searchFaceModel(userId);
 
@@ -153,7 +152,6 @@ public class CheckinServiceImpl implements CheckinService {
             request.form("photo", FileUtil.file(path), "targetModel", faceModel); // Both faceModel from client & DB send request to Python to analyze
             request.form("code", code);
             HttpResponse response = request.execute();
-
             if (response.getStatus() != 200) {
                 log.error("人脸识别服务异常");
                 throw new EmosException("人脸识别服务异常");
@@ -179,7 +177,7 @@ public class CheckinServiceImpl implements CheckinService {
                 if (!StrUtil.isBlank(city) && !StrUtil.isBlank(district)) {
                     String code = cityDao.searchCode(city);
 
-                    // Access bendibao via jsoup to get risk level
+                    // 调用"本地宝"得知疫情风险等级
                     try {
                         String url = "http://m." + code + ".bendibao.com/news/yqdengji/?qu=" + district;
                         Document document = Jsoup.connect(url).get();
@@ -214,7 +212,7 @@ public class CheckinServiceImpl implements CheckinService {
 
                 // 保存签到记录
                 TbCheckin entity = new TbCheckin();
-                entity.setId(userId);
+                entity.setUserId(userId);
                 entity.setAddress(address);
                 entity.setCountry(country);
                 entity.setProvince(province);
@@ -224,6 +222,7 @@ public class CheckinServiceImpl implements CheckinService {
                 entity.setRisk(risk);
                 entity.setDate(DateUtil.today());   // include date without time
                 entity.setCreateTime(now);
+
                 checkinDao.insertCheckin(entity);
             }
         }

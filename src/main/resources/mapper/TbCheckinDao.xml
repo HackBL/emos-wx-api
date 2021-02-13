@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbCheckinDao">
-    <select id="haveCheckin" parameterType="HashMap" resultType="Integer">
-        SELECT id
-        FROM tb_checkin
-        WHERE user_id = #{userId} AND date = CURRENT_DATE
-        AND create_time BETWEEN #{start} AND #{end}
-        LIMIT 1
-    </select>
-    <insert id="insertCheckin" parameterType="com.example.emos.wx.db.pojo.TbCheckin">
-        INSERT INTO tb_checkin
-        SET user_id = #{userId},
-        <if test="address!=null">
-            address = #{address},
-        </if>
-        <if test="country!=null">
-            country = #{country},
-        </if>
-        <if test="province!=null">
-            province = #{province},
-        </if>
-        <if test="city!=null">
-            city = #{city},
-        </if>
-        <if test="district!=null">
-            district = #{district},
-        </if>
-        status = #{status},
-        <if test="risk!=null">
-            risk = #{risk},
-        </if>
-        date = #{date},
-        create_time = #{createTime}
-    </insert>
+  <select id="haveCheckin" parameterType="HashMap" resultType="Integer">
+    SELECT id
+    FROM tb_checkin
+    WHERE user_id = #{userId} AND date = CURRENT_DATE
+      AND create_time BETWEEN #{start} AND #{end}
+      LIMIT 1
+  </select>
+  <insert id="insertCheckin" parameterType="com.example.emos.wx.db.pojo.TbCheckin">
+    INSERT INTO tb_checkin
+    SET user_id = #{userId},
+    <if test="address!=null">
+      address = #{address},
+    </if>
+    <if test="country!=null">
+      country = #{country},
+    </if>
+    <if test="province!=null">
+      province = #{province},
+    </if>
+    <if test="city!=null">
+      city = #{city},
+    </if>
+    <if test="district!=null">
+      district = #{district},
+    </if>
+    status = #{status},
+    <if test="risk!=null">
+      risk = #{risk},
+    </if>
+    date = #{date},
+    create_time = #{createTime}
+  </insert>
 </mapper>
