@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbCheckinDao">
+<!--  查看用户当天是否已经考勤-->
   <select id="haveCheckin" parameterType="HashMap" resultType="Integer">
     SELECT id
     FROM tb_checkin
@@ -8,6 +9,45 @@
       AND create_time BETWEEN #{start} AND #{end}
       LIMIT 1
   </select>
+<!--  查看用户当天签到信息-->
+  <select id="searchTodayCheckin" parameterType="int" resultType="HashMap">
+    SELECT
+        u.name,
+        u.photo,
+        d.dept_name AS deptName,
+        ck.address,
+        CASE
+          WHEN ck.status = 1 THEN '正常'
+          WHEN ck.status = 2 THEN '迟到'
+          END as status,
+        CASE
+          WHEN ck.risk = 1 THEN '低风险'
+          WHEN ck.risk = 2 THEN '中风险'
+          WHEN ck.risk = 2 THEN '高风险'
+          END as risk,
+        DATE_FORMAT(ck.create_time,"%H:%i") AS checkinTime,
+        ck.date
+    FROM tb_user u
+       LEFT JOIN tb_dept d ON u.dept_id = d.id
+       LEFT JOIN tb_checkin ck ON u.id = ck.user_id AND ck.date = CURRENT_DATE
+    WHERE u.id = #{userId} AND u.status = 1
+  </select>
+<!--  查询用户总的签到天数-->
+  <select id="searchCheckinDays" parameterType="int" resultType="long">
+    SELECT COUNT(*) AS count
+    FROM tb_checkin
+    WHERE user_id = #{userId}
+  </select>
+<!--  查询一周内用户考勤情况(签到时间，签到状态)-->
+  <select id="searchWeekCheckin" parameterType="HashMap" resultType="HashMap">
+    SELECT
+        CAST(date AS CHAR) AS date,
+	IF(status = 1, "正常", "迟到") AS status
+    FROM tb_checkin
+    WHERE user_id = #{userId}
+        AND date BETWEEN #{startDate} AND #{endDate}
+  </select>
+<!--  传入用户签到信息-->
   <insert id="insertCheckin" parameterType="com.example.emos.wx.db.pojo.TbCheckin">
     INSERT INTO tb_checkin
     SET user_id = #{userId},

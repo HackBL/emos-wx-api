@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.emos.wx.db.dao.TbHolidaysDao">
+<!--    判断当天是否是节假日，如果存在->是，如果是null->不是 -->
     <select id="searchTodayIsHolidays" resultType="Integer">
         SELECT id FROM tb_holidays WHERE date = CURRENT_DATE LIMIT 1;
+    </select>
+<!--    查询一段期间范围内哪天是特殊节假日-->
+    <select id="searchHolidaysInRange" parameterType="HashMap" resultType="String">
+        SELECT date
+        FROM tb_holidays
+        WHERE date BETWEEN #{startDate} AND #{endDate}
     </select>
 </mapper>
