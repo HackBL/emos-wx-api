@@ -38,11 +38,11 @@
     FROM tb_checkin
     WHERE user_id = #{userId}
   </select>
-<!--  查询一周内用户考勤情况(签到时间，签到状态)-->
+<!--  查询时间范围内用户考勤情况(签到时间，签到状态)-->
   <select id="searchWeekCheckin" parameterType="HashMap" resultType="HashMap">
     SELECT
         CAST(date AS CHAR) AS date,
-	IF(status = 1, "正常", "迟到") AS status
+	    IF(status = 1, "正常", "迟到") AS status
     FROM tb_checkin
     WHERE user_id = #{userId}
         AND date BETWEEN #{startDate} AND #{endDate}
@@ -66,7 +66,7 @@
     <if test="district!=null">
       district = #{district},
     </if>
-    status = #{status},
+      status = #{status},
     <if test="risk!=null">
       risk = #{risk},
     </if>

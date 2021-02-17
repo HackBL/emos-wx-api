@@ -1,5 +1,7 @@
 package com.example.emos.wx.service.impl;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateRange;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -15,6 +17,7 @@ import com.example.emos.wx.exception.EmosException;
 import com.example.emos.wx.service.CheckinService;
 import com.example.emos.wx.task.EmailTask;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.crypto.hash.Hash;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,6 +28,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -132,7 +137,7 @@ public class CheckinServiceImpl implements CheckinService {
         DateTime now = DateUtil.date();
         DateTime attend = DateUtil.parse(DateUtil.today() + " " + constants.attendanceTime);
         DateTime end = DateUtil.parse(DateUtil.today() + " " + constants.attendanceEndTime);
-        int status = 1; // 1: on time, 2: late
+        int status = 1; // 1: 正常签到, 2: 迟到
 
         if (now.isBeforeOrEquals(attend)) {
             status = 1;
@@ -247,4 +252,87 @@ public class CheckinServiceImpl implements CheckinService {
         entity.setFaceModel(body);
         faceModelDao.insertFaceModel(entity);
     }
+
+    /**
+     *  查看用户当天签到信息
+     *  For checkin result page
+     * */
+    @Override
+    public HashMap searchTodayCheckin(int userId) {
+        HashMap map = checkinDao.searchTodayCheckin(userId);
+        return map;
+    }
+
+    /**
+     *  查询用户总的签到天数
+     *  For checkin result page
+     * */
+    @Override
+    public long searchCheckinDays(int userId) {
+        long days = checkinDao.searchCheckinDays(userId);
+        return days;
+    }
+
+    /**
+     *  查询用户时间范围内签到状态记录
+     *  For checkin result page bottom layer
+     * */
+    @Override
+    public ArrayList<HashMap> searchWeekCheckin(HashMap param) {
+        ArrayList<HashMap> checkinList = checkinDao.searchWeekCheckin(param);   // 查询时间范围内用户考勤情况(签到时间，签到状态)
+        ArrayList holidaysList = holidaysDao.searchHolidaysInRange(param);      // 查询时间范围内哪天是特殊节假日
+        ArrayList workdayList = workdayDao.searchWorkdayInRange(param);         // 查询时间范围内哪天是特殊工作日
+        DateTime startDate = DateUtil.parseDate(param.get("startDate").toString());
+        DateTime endDate = DateUtil.parseDate(param.get("endDate").toString());
+        DateRange range = DateUtil.range(startDate, endDate, DateField.DAY_OF_MONTH);   // 时间范围
+
+        ArrayList<HashMap> list = new ArrayList<>();
+
+        // every day in a range of dates
+        for (DateTime one: range) {
+            String date = one.toString();
+            // 当天日子
+            String type = "工作日";
+            if (one.isWeekend()) {  // 周末休息日
+                type = "休息日";
+            }
+            if (holidaysList != null && holidaysList.contains(date)) {      // 特殊节假日
+                type = "休息日";
+            }
+            else if (workdayList != null && workdayList.contains(date)) {   // 特殊工作日
+                type = "工作日";
+            }
+
+            // 考勤结果
+            String status = "";     // 空字符串：未到考勤结束时间，未来日期，不记录考勤结果
+            if (type.equals("工作日") && one.isBeforeOrEquals(DateUtil.date())) {  // 查询日期 <= 当前日期
+                status = "缺勤";  // 默认为缺勤状态
+                boolean flag = false;   // 如果当天在签到结束前签过到，被记录下来
+
+                for (HashMap<String, String> map: checkinList) {
+                    if (map.containsValue(date)) {  // 用户已经签过到
+                        status = map.get("status");
+                        flag = true;
+                        break;
+                    }
+                }
+
+                DateTime endTime = DateUtil.parse(DateUtil.today() + " " + constants.attendanceEndTime);    // 当天签到结束时间
+                String today = DateUtil.today();
+                if (date.equals(today) && DateUtil.date().isBefore(endTime) && !flag) { // 当天签到结束前，并且没有签到，无记录
+                    status = "";
+                }
+            }
+            HashMap map = new HashMap();
+            map.put("date", date);
+            map.put("status", status);
+            map.put("type", type);
+            map.put("day", one.dayOfWeekEnum().toChinese("周"));  // day of week
+            list.add(map);
+        }
+
+        return list;
+    }
 }
+
+

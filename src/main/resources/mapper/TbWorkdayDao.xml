@@ -6,7 +6,7 @@
     <select id="searchTodayIsWorkday" resultType="Integer">
         SELECT id FROM tb_workday WHERE date = CURRENT_DATE LIMIT 1;
     </select>
-<!--    查询一段期间范围内哪天是特殊工作日-->
+<!--    查询时间范围内哪天是特殊工作日-->
     <select id="searchWorkdayInRange" parameterType="HashMap" resultType="String">
         SELECT date
         FROM tb_workday
