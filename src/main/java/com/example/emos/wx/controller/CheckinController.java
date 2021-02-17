@@ -44,6 +44,12 @@ public class CheckinController {
     }
 
 
+    /**
+     *  如果加了@RequestBody注解，图片也会被传入到form类，
+     *  但是在CheckinForm类中，并没有定义图片这个变量，
+     *  所以会出现超出范围的异常。
+     *  但是图片的变量是无法定义在CheckinForm类中的
+     * */
     @PostMapping("/checkin") // 上传图片，需要Post Request
     @ApiOperation("签到")
     public R checkin(@Valid CheckinForm form, @RequestParam("photo") MultipartFile file, @RequestHeader("token") String token) {
