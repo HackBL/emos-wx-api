@@ -5,7 +5,7 @@
     <select id="searchTodayIsHolidays" resultType="Integer">
         SELECT id FROM tb_holidays WHERE date = CURRENT_DATE LIMIT 1;
     </select>
-<!--    查询一段期间范围内哪天是特殊节假日-->
+<!--    查询时间范围内哪天是特殊节假日-->
     <select id="searchHolidaysInRange" parameterType="HashMap" resultType="String">
         SELECT date
         FROM tb_holidays
