@@ -120,8 +120,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String searchUserHireDate(int userId) {
-        String hireDate = userDao.searchUserHireDate(userId);
+    public String searchUserHiredate(int userId) {
+        String hireDate = userDao.searchUserHiredate(userId);
         return hireDate;
     }
 }
