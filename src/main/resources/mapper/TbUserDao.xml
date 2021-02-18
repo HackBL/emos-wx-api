@@ -33,6 +33,12 @@
             ON u.id = d.id
         WHERE u.id = #{userId} AND u.status = 1
     </select>
+<!--    查找用户入职日期-->
+    <select id="searchUserHireDate" parameterType="int" resultType="String">
+        SELECT hiredate
+        FROM tb_user
+        WHERE id = #{userId} AND status = 1
+    </select>
 <!--    用户注册，传入信息-->
     <insert id="insert" parameterType="HashMap">
         INSERT INTO tb_user
