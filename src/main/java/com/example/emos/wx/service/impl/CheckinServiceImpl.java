@@ -276,6 +276,7 @@ public class CheckinServiceImpl implements CheckinService {
     /**
      *  查询用户时间范围内签到状态记录
      *  For checkin result page bottom layer
+     *  需要参数：startDate，endDate，userId
      * */
     @Override
     public ArrayList<HashMap> searchWeekCheckin(HashMap param) {
