@@ -280,9 +280,9 @@ public class CheckinServiceImpl implements CheckinService {
      * */
     @Override
     public ArrayList<HashMap> searchWeekCheckin(HashMap param) {
-        ArrayList<HashMap> checkinList = checkinDao.searchWeekCheckin(param);   // 查询时间范围内用户考勤情况(签到时间，签到状态)
-        ArrayList holidaysList = holidaysDao.searchHolidaysInRange(param);      // 查询时间范围内哪天是特殊节假日
-        ArrayList workdayList = workdayDao.searchWorkdayInRange(param);         // 查询时间范围内哪天是特殊工作日
+        ArrayList<HashMap> checkinList = checkinDao.searchWeekCheckin(param);           // 查询时间范围内用户考勤情况(签到时间，签到状态)
+        ArrayList<String> holidaysList = holidaysDao.searchHolidaysInRange(param);      // 查询时间范围内哪天是特殊节假日
+        ArrayList<String> workdayList = workdayDao.searchWorkdayInRange(param);         // 查询时间范围内哪天是特殊工作日
         DateTime startDate = DateUtil.parseDate(param.get("startDate").toString());
         DateTime endDate = DateUtil.parseDate(param.get("endDate").toString());
         DateRange range = DateUtil.range(startDate, endDate, DateField.DAY_OF_MONTH);   // 时间范围
@@ -291,7 +291,7 @@ public class CheckinServiceImpl implements CheckinService {
 
         // every day in a range of dates
         for (DateTime one: range) {
-            String date = one.toString();
+            String date = one.toString("yyyy-MM-dd");
             // 当天日子
             String type = "工作日";
             if (one.isWeekend()) {  // 周末休息日
@@ -324,6 +324,7 @@ public class CheckinServiceImpl implements CheckinService {
                     status = "";
                 }
             }
+
             HashMap map = new HashMap();
             map.put("date", date);
             map.put("status", status);
