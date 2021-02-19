@@ -1,5 +1,6 @@
 package com.example.emos.wx.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.example.emos.wx.common.util.R;
 import com.example.emos.wx.config.shiro.JwtUtil;
 import com.example.emos.wx.controller.form.LoginForm;
@@ -10,10 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Set;
@@ -54,12 +52,18 @@ public class userController {
      * */
     @PostMapping("/login")
     @ApiOperation("登陆系统")
-    public R login(@Valid @RequestBody LoginForm form) {
-        int userId = userService.login(form.getCode());
-        String token = jwtUtil.createToken(userId);
-        Set<String> permsSet = userService.searchUserPermissions(userId);
-        saveCacheToken(token, userId);
+    public R login(@Valid @RequestBody LoginForm form, @RequestHeader("token") String token) {
+        int userId;
+        try {                       // token正常登陆
+            jwtUtil.verifierToken(token);
+            userId = jwtUtil.getUserId(token);
+        } catch (Exception e) {     // 没注册登陆 & token过期登陆
+            userId = userService.login(form.getCode());
+            token = jwtUtil.createToken(userId);
+            saveCacheToken(token, userId);
+        }
 
+        Set<String> permsSet = userService.searchUserPermissions(userId);
         return R.ok("登陆成功").put("token", token).put("permission", permsSet);
     }
 
